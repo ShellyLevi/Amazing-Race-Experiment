@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Decision Task - Phase 1</title>
+    
+    <style>
+        :root {
+            --gold: #f5c842;
+            --gold-light: #ffe999;
+            --gold-dark: #c8960a;
+            --cyan: #00c8ff;
+            --blue-deep: #020c22;
+            --text: #eef3ff;
+            --text-muted: #8da0c4;
+            --card-overlay: rgba(6, 12, 34, 0.9);
+            --gold-glow: rgba(245,200,66,0.4);
+            --env-red: #d32f2f;
+            --env-yellow: #fdd835;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            min-height: 100vh;
+            font-family: 'Barlow', sans-serif;
+            color: var(--text);
+            background-color: var(--blue-deep);
+            display: flex;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        /* ── MAXIMUM STARFIELD BACKGROUND ── */
+        .bg {
+            position: fixed; inset: 0; z-index: -1;
+            background-image:
+                radial-gradient(circle at 80% 20%, rgba(0, 150, 255, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 20% 80%, rgba(30, 80, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 15% 15%, #fff 2px, transparent 0),
+                radial-gradient(circle at 85% 20%, #fff 2px, transparent 0),
+                radial-gradient(circle at 50% 80%, #fff 2px, transparent 0),
+                radial-gradient(circle at 25% 45%, #fff 1px, transparent 0),
+                radial-gradient(circle at 70% 75%, #fff 1px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 250px 250px, 350px 350px, 180px 180px;
+        }
+
+        .page {
+            position: relative; z-index: 10;
+            width: min(900px, 95vw);
+            margin: 30px auto;
+            animation: up 0.7s ease-out;
+        }
+        @keyframes up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hero {
+            background: linear-gradient(to bottom, rgba(8,14,50,0.8), rgba(4,7,18,0.95));
+            border: 1px solid var(--gold); border-radius: 20px;
+            padding: 30px; text-align: center; margin-bottom: 25px;
+        }
+        .main-logo { width: 160px; filter: drop-shadow(0 0 15px var(--gold-glow)); margin-bottom: 15px; }
+        
+        h1 {
+            font-family: 'Barlow Condensed', sans-serif; font-size: 2.5rem;
+            font-weight: 900; color: var(--gold-light); text-transform: uppercase;
+        }
+
+        .mission-brief {
+            background: rgba(255, 255, 255, 0.05);
+            border-top: 2px solid var(--env-red);
+            border-bottom: 2px solid var(--env-red);
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-style: italic;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        /* ── ENVELOPES ── */
+        .clue-instruction { text-align: center; margin-bottom: 15px; font-family: 'Barlow Condensed'; color: var(--gold); font-weight: 700; text-transform: uppercase; }
+        
+        .grid { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; margin-bottom: 25px; }
+
+        .clue-envelope {
+            position: relative; background: var(--env-yellow); height: 180px;
+            border-radius: 4px; cursor: pointer; overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4); transition: 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .clue-envelope::before {
+            content: ''; position: absolute; top: 0; width: 100%; height: 12px;
+            background: repeating-linear-gradient(45deg, var(--env-red), var(--env-red) 10px, #fff 10px, #fff 20px);
+        }
+        .clue-envelope:hover { transform: translateY(-5px); }
+
+        .clue-label { font-family: 'Barlow Condensed'; font-weight: 900; font-size: 1.5rem; color: #000; text-transform: uppercase; text-align: center; padding: 20px; }
+        
+        .clue-card-revealed {
+            display: none; background: var(--card-overlay); padding: 25px; border-radius: 15px;
+            border: 1px solid var(--cyan); height: 100%;
+        }
+        .clue-card-revealed h2 {
+            font-family: 'Barlow Condensed'; color: var(--cyan); font-size: 1.4rem;
+            text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid rgba(0,200,255,0.2);
+        }
+
+        .metric {
+            background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px;
+            text-align: center; margin-top: 10px; border-left: 4px solid var(--gold);
+        }
+        .metric-value { font-size: 1.6rem; font-weight: 900; color: var(--gold); }
+        .highlight { color: var(--gold); font-weight: 800; }
+
+        /* ── FORM ── */
+        #decision-form-container { display: none; animation: fadeIn 0.5s; }
+        .form-card {
+            background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(20,20,20,0.8));
+            border: 2px solid var(--gold); padding: 30px; border-radius: 20px;
+        }
+        
+        .option {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 15px;
+        }
+        .option:hover { border-color: var(--gold); }
+
+        .btn {
+            width: 100%; background: var(--gold); color: #000; border: none;
+            padding: 18px; border-radius: 50px; font-family: 'Barlow Condensed';
+            font-size: 1.4rem; font-weight: 900; cursor: pointer; text-transform: uppercase;
+        }
+        .btn:disabled { background: #444; color: #888; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 15px 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .step {
+            font-family: 'Barlow Condensed';
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 5px 15px;
+            border-radius: 5px;
+            color: var(--text-muted);
+        }
+
+        .step.active {
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            background: rgba(245,200,66,0.1);
+        }
+
+        .reminder-btn {
+            background: rgba(245,200,66,0.1);
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 8px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Barlow Condensed';
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .reminder-btn:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0,0,0,0.85);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: #eef3ff;
+            color: #020c22;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 40px;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 30px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="page">
+    <div class="hero">
+        <img src="{{ url_for('static', filename='Gemini_Generated_Image_v2v29lv2v29lv2v2.png') }}" alt="Mission Logo" class="main-logo">
+        <h1>Decision Task — Phase 1</h1>
+        
+        <div class="mission-brief">
+            As part of your mission in the Amazing Race, you must complete this mission, to reach the Pit Stop. Review your clues carefully and decide: will you take the risk and invest, or play it safe to protect your budget? The race is on!
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <div class="stepper">
+            <span class="step active">Phase 1</span>
+            <span class="step">Phase 2</span>
+        </div>
+        <button type="button" class="reminder-btn" onclick="openReminder()">MISSION BRIEF 📂</button>
+    </div>
+
+    <div class="clue-instruction">⚠️ Open both envelopes to reveal your mission data</div>
+
+    <div class="grid">
+        <div id="env-private" class="clue-envelope" onclick="revealClue('private')">
+            <div class="clue-label">Private Information ✉️</div>
+        </div>
+        <div id="card-private" class="clue-card-revealed">
+            <h2>Private Information</h2>
+            <p>You drew a ball from a jar containing 100 balls. One color is the majority (70 vs 30).</p>
+            <div class="metric">
+                <div style="font-size: 0.8rem; color: var(--text-muted);">YOUR SIGNAL</div>
+                <div class="metric-value">{{ color }}</div>
+            </div>
+        </div>
+
+        <div id="env-public" class="clue-envelope" onclick="revealClue('public')">
+            <div class="clue-label">Public Information ✉️</div>
+        </div>
+        <div id="card-public" class="clue-card-revealed">
+            <h2>Public Information</h2>
+            <p>Participant ID: <span class="highlight">{{ position }}</span>/15</p>
+            <p>Invested: <span class="highlight">{{ investors_blue }}</span> | Refused: <span class="highlight">{{ investors_not_blue }}</span></p>
+            <div style="background: rgba(211,47,47,0.1); border: 1px solid var(--env-red); padding: 8px; border-radius: 5px; font-size: 0.85rem; margin-top: 10px;">
+                {% if investment_threshold %}
+                    Requires <strong>{{ investment_threshold }}</strong> investors for success.
+                {% else %}
+                    Requires majority for success.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div id="decision-form-container">
+        <form action="{{ url_for('submit_phase1') }}" method="post" class="form-card">
+            <input type="hidden" name="row" value="{{ row }}">
+            
+            <h2 style="font-family: 'Barlow Condensed'; color: var(--gold); margin-bottom: 15px; text-transform: uppercase;">Your Decision</h2>
+            
+            <p style="margin-bottom: 10px; font-weight: 600;">1. What is your choice?</p>
+            <div class="options">
+                <label class="option"><input type="radio" name="initial_decision" value="Invest" required><span>Invest $0.5</span></label>
+                <label class="option"><input type="radio" name="initial_decision" value="Do Not Invest" required><span>Do Not Invest</span></label>
+            </div>
+
+            <p style="margin-bottom: 10px; font-weight: 600;">2. Confidence Level?</p>
+            <div class="options">
+                <label class="option"><input type="radio" name="initial_confidence" value="High" required><span>High Confidence</span></label>
+                <label class="option"><input type="radio" name="initial_confidence" value="Low" required><span>Low Confidence</span></label>
+            </div>
+
+            <button id="btn" class="btn" disabled>Continue (10)</button>
+        </form>
+    </div>
+</div>
+
+<div id="reminderModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeReminder()">&times;</span>
+        <h2 style="font-family: 'Barlow Condensed'; color: var(--env-red); text-transform: uppercase;">Mission Briefing</h2>
+        <div style="margin-top: 15px;">
+            <p><b>Investment Details:</b></p>
+            <ul>
+                <li>Investment Cost: $0.5 (Budget: $2.0)</li>
+                <li>Project Success: Earn +$0.5 (Total $2.5)</li>
+                <li>Project Failure: Lose -$0.5 (Total $1.5)</li>
+                <li>No Investment: Retain $2.0</li>
+            </ul>
+            <p style="margin-top:15px;"><b>Success Conditions:</b></p>
+            <p>The project succeeds ONLY if the investment threshold is reached AND the dominant jar color is Blue.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let cluesOpened = { private: false, public: false };
+
+    function revealClue(type) {
+        document.getElementById('env-' + type).style.display = 'none';
+        document.getElementById('card-' + type).style.display = 'block';
+        cluesOpened[type] = true;
+        
+        if (cluesOpened.private && cluesOpened.public) {
+            document.getElementById('decision-form-container').style.display = 'block';
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        let sec = 10;
+        const btn = document.getElementById("btn");
+        const timer = setInterval(() => {
+            sec--;
+            btn.innerText = "Continue (" + sec + ")";
+            if (sec <= 0) {
+                clearInterval(timer);
+                btn.disabled = false;
+                btn.innerText = "Check-in Phase 1";
+            }
+        }, 1000);
+    }
+    function openReminder() {
+        document.getElementById("reminderModal").style.display = "block";
+    }
+
+    function closeReminder() {
+        document.getElementById("reminderModal").style.display = "none";
+    }
+
+    window.onclick = (e) => {
+        if (e.target.id === "reminderModal") closeReminder();
+    }
+    </script>
+</body>
+</html>

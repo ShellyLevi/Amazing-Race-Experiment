@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Just a moment...</title>
+    <style>
+        :root {
+            --gold: #f5c842;
+            --gold-light: #ffe999;
+            --gold-dark: #c8960a;
+            --blue-deep: #020c22;
+            --text: #eef3ff;
+            --text-muted: #8da0c4;
+            --card-overlay: rgba(6, 12, 34, 0.9);
+            --gold-glow: rgba(245,200,66,0.6);
+            --env-red: #d32f2f;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh;
+            font-family: 'Barlow', sans-serif;
+            color: var(--text);
+            background-color: var(--blue-deep);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bg-container {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+        .page {
+            position: relative;
+            z-index: 10;
+            width: min(550px, 90vw);
+            animation: up 0.7s ease-out;
+        }
+        @keyframes up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .main-container {
+            background: var(--card-overlay);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0,200,255,0.2);
+            border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+            text-align: center;
+            padding: 40px;
+        }
+        .logo-wrap {
+            display: flex;
+            justify-content: center;
+            padding-bottom: 20px;
+        }
+        .small-logo-globe {
+            width: 180px;
+            filter: drop-shadow(0 0 15px var(--gold-glow));
+        }
+        .red-mission-stripe {
+            width: 85%;
+            height: 4px;
+            background-color: var(--env-red);
+            border-radius: 999px;
+            margin: 0 auto 25px;
+        }
+        .eyebrow {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 999px;
+            background: rgba(245, 200, 66, 0.1);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        h1 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            text-shadow: 0 0 15px var(--gold-glow);
+            margin-bottom: 15px;
+        }
+        .countdown {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
+            transition: width 0.3s ease;
+        }
+        .refresh-button {
+            display: inline-flex;
+            padding: 16px 45px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #c8960a, #f5c842);
+            color: #000;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-container" id="bgLayer"></div>
+    <div class="bg-overlay"></div>
+    <div class="page">
+        <div class="main-container">
+            <div class="logo-wrap">
+                <img src="" id="logoImg" alt="Globe" class="small-logo-globe">
+            </div>
+            <div class="red-mission-stripe"></div>
+            <div class="eyebrow">Update</div>
+            <h1>Just a moment, something got stuck...</h1>
+            <p style="margin-bottom: 20px;">Connection or server load issues. Your progress is safe.</p>
+            <div class="countdown" id="countdown">5</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+            <button class="refresh-button" onclick="location.reload()">Refresh Now ⚡</button>
+        </div>
+    </div>
+    <script>
+        const bg = document.getElementById('bgLayer');
+        const logo = document.getElementById('logoImg');
+        const extensions = ['png', 'jpg', 'jpeg', 'png.jpg', 'png.png'];
+        
+        function tryLoad(index) {
+            if (index >= extensions.length) return;
+            const fileName = "{{ url_for('static', filename='globe') }}." + extensions[index];
+            const img = new Image();
+            img.onload = function() {
+                bg.style.backgroundImage = "url('" + fileName + "')";
+                logo.src = fileName;
+            };
+            img.onerror = function() { tryLoad(index + 1); };
+            img.src = fileName;
+        }
+        tryLoad(0);
+
+        let seconds = 5;
+        const countdownElement = document.getElementById('countdown');
+        const progressElement = document.getElementById('progress');
+        setInterval(() => {
+            seconds--;
+            countdownElement.textContent = Math.max(seconds, 0);
+            progressElement.style.width = ((5 - seconds) / 5) * 100 + '%';
+            if (seconds <= 0) location.reload();
+        }, 1000);
+    </script>
+</body>
+</html>

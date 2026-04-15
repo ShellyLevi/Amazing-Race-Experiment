@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Consent - The Amazing Race</title>
+
+    <style>
+        :root {
+            --gold:        #f5c842;
+            --gold-light:  #ffe999;
+            --gold-dark:   #c8960a;
+            --cyan:        #00c8ff;
+            --blue-deep:   #020c22; 
+            --text:        #eef3ff;
+            --text-muted:  #8da0c4;
+            --border-blue: rgba(0,200,255,0.25);
+            --card-overlay: rgba(6, 12, 34, 0.85); 
+            --env-yellow: #fdd835;
+            --env-red: #d32f2f;
+            --gold-glow: rgba(245,200,66,0.5);
+            --red-glow: rgba(211,47,47,0.5);
+        }
+
+        * { box-sizing:border-box; margin:0; padding:0; }
+        
+        body {
+            min-height:100vh;
+            font-family:'Barlow',sans-serif;
+            color:var(--text);
+            background-color: var(--blue-deep);
+            overflow-x:hidden;
+        }
+
+        .bg {
+            position:fixed; inset:0; z-index:-1;
+            background-image:
+                radial-gradient(circle at 15% 15%, #fff 1.5px, transparent 0),
+                radial-gradient(circle at 85% 20%, #fff 1.5px, transparent 0),
+                radial-gradient(circle at 50% 80%, #fff 1.2px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 250px 250px, 350px 350px;
+        }
+
+        .page {
+            position:relative; z-index:10;
+            width:min(1000px, calc(100% - 24px));
+            margin:15px auto 60px;
+            animation:up .7s ease-out;
+        }
+        @keyframes up { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        /* ── HEADER ── */
+        .header-section {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--card-overlay); padding: 20px 30px; border-radius: 20px;
+            border: 1px solid var(--border-blue); margin-bottom: 20px; backdrop-filter: blur(10px);
+        }
+        .participation-notice { flex: 1; text-align: left; border-left: 3px solid var(--gold); padding-left: 20px; }
+        .participation-notice h4 { color: var(--gold); text-transform: uppercase; font-family: 'Barlow Condensed'; font-size: 1.2rem; margin-bottom: 5px;}
+        .participation-notice p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+        .small-logo { width: 140px; margin-left: 30px; }
+
+        .mission-box {
+            text-align: center; padding: 30px; border-radius: 20px;
+            background: linear-gradient(to bottom, rgba(8,14,50,.8), rgba(4,7,18,.95));
+            border: 1px solid var(--border-blue); margin-bottom: 25px;
+        }
+        .mission-box h1 { font-family: 'Barlow Condensed'; font-weight: 900; color: var(--gold-light); text-transform: uppercase; font-size: 2rem; margin-bottom: 15px; }
+        .mission-box p { font-size: 1rem; color: var(--text); line-height: 1.6; max-width: 850px; margin: 0 auto; }
+
+        .static-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .static-card {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--cyan);
+            padding: 22px; border-radius: 15px;
+        }
+        .static-card h2 { font-family: 'Barlow Condensed'; color: var(--cyan); text-transform: uppercase; font-size: 1.2rem; margin-bottom: 10px; border-bottom: 1px solid rgba(0,200,255,0.2); padding-bottom: 5px; }
+
+        .long-card {
+            background: rgba(255,255,255,0.07); border: 1px solid var(--gold);
+            padding: 25px; border-radius: 15px; margin-bottom: 30px;
+        }
+        .long-card h2 { font-family: 'Barlow Condensed'; color: var(--gold); text-transform: uppercase; font-size: 1.4rem; margin-bottom: 12px; }
+
+        .clue-instruction { text-align: center; margin-bottom: 15px; font-family: 'Barlow Condensed'; color: var(--gold); letter-spacing: 1px; font-weight: 700; }
+        
+        /* ── INTERACTIVE ENVELOPES ── */
+        .envelopes-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px; margin-bottom: 40px;
+        }
+        .clue-envelope {
+            position: relative; background: var(--env-yellow); height: 160px;
+            border-radius: 4px; cursor: pointer; overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4); transition: 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .clue-envelope:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.6); }
+        .clue-envelope::before {
+            content: ''; position: absolute; top: 0; width: 100%; height: 12px;
+            background: repeating-linear-gradient(45deg, var(--env-red), var(--env-red) 10px, #fff 10px, #fff 20px);
+        }
+        .clue-envelope.opened { background: #fff; height: auto; min-height: 160px; cursor: default; }
+        .clue-envelope.opened::before { display: none; }
+        
+        .clue-label { font-family: 'Barlow Condensed'; font-weight: 900; font-size: 1.4rem; color: #000; text-transform: uppercase; text-align: center; padding: 20px; }
+        .clue-content { display: none; padding: 25px 20px; color: #000; }
+        .clue-content h3 { font-family: 'Barlow Condensed'; margin-bottom: 10px; border-bottom: 2px solid #000; text-transform: uppercase; font-size: 1.2rem;}
+        
+        .clue-envelope.opened .clue-label { display: none; }
+        .clue-envelope.opened .clue-content { display: block; animation: fadeIn 0.5s; }
+
+        .questions-footer { text-align: center; padding: 20px; border-top: 1px solid var(--border-blue); color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; }
+
+        /* ── FINAL CONSENT (RED & YELLOW PIT STOP STYLE) ── */
+        #consent-section {
+            display: none; 
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: var(--env-red); /* Outer red line */
+            padding: 10px;
+            animation: fadeIn 0.8s;
+            box-shadow: 0 0 35px var(--red-glow);
+        }
+
+        .checkered-wrapper {
+            background-color: var(--env-yellow); /* Yellow base */
+            padding: 15px;
+            /* Checkered pattern: Yellow and Red */
+            background-image: 
+                linear-gradient(45deg, var(--env-red) 25%, transparent 25%, transparent 75%, var(--env-red) 75%, var(--env-red)), 
+                linear-gradient(45deg, var(--env-red) 25%, transparent 25%, transparent 75%, var(--env-red) 75%, var(--env-red));
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+            position: relative;
+        }
+
+        .consent-card-main {
+            background-color: #211d1a; /* Dark inside from image */
+            padding: 30px;
+            text-align: center;
+            border-radius: 2px;
+            color: #fff;
+            border: 2px solid var(--env-yellow);
+        }
+
+        .consent-card-main h2 {
+            font-family: 'Barlow Condensed';
+            font-size: 2.3rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .consent-card-main h2 span {
+            color: var(--env-red);
+        }
+
+        .id-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .id-row label {
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+
+        .id-input {
+            width: 180px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.4rem;
+            font-family: inherit;
+            color: #000;
+            background: #fff;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .option-row {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .opt {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .opt input {
+            transform: scale(1.6);
+            accent-color: var(--env-red);
+        }
+
+        .continue-gold-btn {
+            background: linear-gradient(to bottom, #f5c842, #c8960a);
+            color: #000;
+            border: none;
+            padding: 14px 60px;
+            border-radius: 50px;
+            font-family: 'Barlow Condensed';
+            font-size: 1.6rem;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            transition: 0.2s;
+        }
+
+        .continue-gold-btn:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { .static-grid { grid-template-columns: 1fr; } .option-row { flex-direction: column; align-items: center; gap: 15px; } }
+    </style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="page">
+    
+    <header class="header-section">
+        <div class="participation-notice">
+            <h4>Before You Participate</h4>
+            <p>Please read this page carefully before continuing. The consent section will appear after 15 seconds and once all clues are opened.</p>
+        </div>
+        <img src="{{ url_for('static', filename='Gemini_Generated_Image_v2v29lv2v29lv2v2.png') }}" alt="Logo" class="small-logo">
+    </header>
+
+    <section class="mission-box">
+        <h1>Decision-Making and Confidence Signals Mission</h1>
+        <p>You are invited to participate in an online research experiment. Before deciding whether to participate, it is important for you to understand the study, what will be expected of you, and any potential risks or benefits.</p>
+    </section>
+
+    <div class="static-grid">
+        <div class="static-card">
+            <h2>Purpose of the Study</h2>
+            <p>The purpose of this study is to investigate decision-making under uncertainty in group settings, focusing on how private information, others’ decisions, and confidence cues influence behavior and contribute to information cascades.</p>
+        </div>
+        <div class="static-card">
+            <h2>Notice</h2>
+            <p>Some elements are intentionally not fully disclosed in advance in order to preserve the validity of the study. A full explanation will be provided during the debriefing at the end.</p>
+        </div>
+    </div>
+
+    <div class="long-card">
+        <h2>Procedures</h2>
+        <p>You will be asked to provide Prolific ID. You will then receive instructions regarding the experiment.</p>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+            <p><strong>Stage 1 – Training Stage:</strong> Complete a short set of tasks to ensure you understand the task structure and probabilistic reasoning. Must pass to proceed.</p>
+            <p><strong>Stage 2 – Main Experiment:</strong> Receive a private signal, observe previous decisions, and make choices after seeing additional confidence information.</p>
+        </div>
+    </div>
+
+    <div class="clue-instruction">⚠️ OPEN ALL CLUES BELOW TO UNLOCK PIT STOP ⚠️</div>
+
+    <div class="envelopes-grid">
+        <div class="clue-envelope" onclick="openClue(this)">
+            <div class="clue-label">Risks and Benefits ✉️</div>
+            <div class="clue-content">
+                <h3>Risks and Benefits</h3>
+                <p>There are no known physical risks associated with this study. There may be minimal online privacy risks. Benefits include contributing to research and experiencing a realistic decision-making task.</p>
+            </div>
+        </div>
+
+        <div class="clue-envelope" onclick="openClue(this)">
+            <div class="clue-label">Confidentiality & Payment ✉️</div>
+            <div class="clue-content">
+                <h3>Confidentiality & Payment</h3>
+                <p>Your personal information will not be collected or stored, aside from a Prolific ID necessary for payment. Data will be anonymized.</p>
+                <p style="margin-top:10px;"><strong>Payment:</strong> You will get the payment approximately within a week.</p>
+            </div>
+        </div>
+
+        <div class="clue-envelope" onclick="openClue(this)">
+            <div class="clue-label">Publishing & Voluntary ✉️</div>
+            <div class="clue-content">
+                <h3>Publishing & Voluntary</h3>
+                <p>The results of this study may be shared through academic publications, conferences, and other research outlets. Participation is voluntary, and you are free to withdraw at any point without consequence.</p>
+            </div>
+        </div>
+    </div>
+
+    <section class="questions-footer">
+        <p>If you have any questions about the study, please contact us at:</p>
+        <p><strong>shelll@post.bgu.ac.il</strong> | <strong>hajajer@post.bgu.ac.il</strong></p>
+    </section>
+
+    <form id="consent-section" action="/submit_consent" method="post">
+        <div class="checkered-wrapper">
+            <div class="consent-card-main">
+                <h2><span>CONSENT</span></h2>
+                
+                <div class="id-row">
+                    <label>Prolific ID:</label>
+                    <input type="text" name="participant_id" class="id-input" required placeholder="ID">
+                </div>
+
+                <div class="option-row">
+                    <label class="opt"><input type="radio" name="consent" value="agree" required> I Agree</label>
+                    <label class="opt"><input type="radio" name="consent" value="disagree"> I Do Not Agree</label>
+                </div>
+
+                <button type="submit" class="continue-gold-btn">CONTINUE →</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    let timerDone = false;
+    let openedCount = 0;
+    const totalEnvelopes = 3;
+
+    function openClue(el) {
+        if (!el.classList.contains('opened')) {
+            el.classList.add('opened');
+            openedCount++;
+            checkUnlock();
+        }
+    }
+
+    function checkUnlock() {
+        if (timerDone && openedCount >= totalEnvelopes) {
+            const section = document.getElementById("consent-section");
+            section.style.display = "block";
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    setTimeout(function() {
+        timerDone = true;
+        checkUnlock();
+    }, 15000); // 15 seconds
+</script>
+
+</body>
+</html>

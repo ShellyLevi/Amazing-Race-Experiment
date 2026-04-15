@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>The Amazing Race - Eliminated</title>
+    
+    <style>
+        :root {
+            --gold: #f5c842;
+            --gold-light: #ffe999;
+            --gold-dark: #c8960a;
+            --blue-deep: #020c22;
+            --text: #eef3ff;
+            --text-muted: #8da0c4;
+            --card-overlay: rgba(6, 12, 34, 0.95);
+            --env-red: #d32f2f;
+            --env-yellow: #fdd835;
+            --race-red: #e11d48;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            min-height: 100vh;
+            font-family: 'Barlow', sans-serif;
+            color: var(--text);
+            background-color: var(--blue-deep);
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ── MAXIMUM STARFIELD BACKGROUND ── */
+        .bg {
+            position: fixed; inset: 0; z-index: -1;
+            background-image:
+                radial-gradient(circle at 80% 20%, rgba(0, 150, 255, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 20% 80%, rgba(30, 80, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 15% 15%, #fff 2px, transparent 0),
+                radial-gradient(circle at 85% 20%, #fff 2px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 250px 250px;
+        }
+
+        .page {
+            position: relative; z-index: 10;
+            width: min(900px, 95vw);
+            margin: 40px auto;
+            animation: up 0.7s ease-out;
+        }
+        @keyframes up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ── HEADER WITH COLORED GLOBE (Left) ── */
+        .hero { 
+            display: flex; align-items: center; justify-content: flex-start; 
+            width: 100%; max-width: 820px;
+            margin: 0 auto 30px auto;
+            gap: 25px;
+            background: rgba(225, 29, 72, 0.1); 
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid var(--race-red); 
+            box-shadow: 0 0 30px rgba(225, 29, 72, 0.2);
+        }
+        
+        .globe-container {
+            width: 150px; 
+            height: 100px; 
+            flex-shrink: 0;
+            overflow: hidden;
+            border-radius: 8px; 
+            border: 2px solid #fff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .globe-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .header-text { text-align: left; }
+
+        h1 {
+            font-family: 'Barlow Condensed', sans-serif; font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+            font-weight: 900; color: #fff; text-transform: uppercase; margin-bottom: 5px;
+            line-height: 1.1;
+        }
+
+        .briefing-text { color: var(--gold); font-weight: 700; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ── THE RACE CONTAINER WITH ICONIC FLAGS ── */
+        .race-container { position: relative; padding: 0 40px; margin-top: 30px; width: 100%; max-width: 820px; margin-left: auto; margin-right: auto; }
+        
+        .flag-side {
+            position: absolute; top: 0; bottom: 0; width: 12px;
+            background: linear-gradient(to bottom, var(--env-red) 33%, var(--env-yellow) 33%, var(--env-yellow) 66%, #000 66%);
+            border-radius: 2px;
+        }
+        .flag-left { left: 15px; }
+        .flag-right { right: 15px; }
+
+        .content-card {
+            background: var(--card-overlay);
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        h2 { 
+            font-family: 'Barlow Condensed'; color: var(--race-red);
+            font-size: 2.2rem; text-transform: uppercase; margin-bottom: 25px;
+            letter-spacing: 2px; font-weight: 900;
+        }
+
+        p { line-height: 1.7; margin-bottom: 20px; font-size: 1.25rem; color: var(--text); }
+        
+        .notice-box {
+            background: rgba(225, 29, 72, 0.15);
+            border: 1px solid var(--race-red);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .notice-box p { font-weight: 700; color: #fff; font-size: 1.4rem; }
+
+        .contact-box {
+            margin-top: 40px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-top: 2px solid var(--gold);
+        }
+        
+        .contact-box h3 { font-family: 'Barlow Condensed'; color: var(--gold); margin-bottom: 15px; text-transform: uppercase; }
+        .email-link { color: var(--gold-light); font-weight: 600; text-decoration: none; display: block; margin-top: 5px; font-size: 1.1rem; }
+
+        @media (max-width: 768px) { 
+            .hero { flex-direction: column; align-items: center; text-align: center; gap: 15px; }
+            .header-text { text-align: center; }
+            .race-container { padding: 0 20px; } .flag-side { width: 6px; } 
+            .globe-container { width: 100%; max-width: 250px; height: 150px; }
+        }
+    </style>
+    
+    <script>
+        history.pushState(null, "", location.href);
+        window.onpopstate = function () {
+            history.pushState(null, "", location.href);
+        };
+    </script>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="page">
+    <div class="hero">
+        <div class="globe-container">
+            <img src="{{ url_for('static', filename='globe.png') }}" id="globeImage" alt="Race Globe" class="globe-img">
+        </div>
+        <div class="header-text">
+            <div class="briefing-text">Race Update</div>
+            <h1>Your Journey Ends Here</h1>
+        </div>
+    </div>
+
+    <div class="race-container">
+        <div class="flag-side flag-left"></div>
+        <div class="flag-side flag-right"></div>
+
+        <div class="content-card">
+            <div class="notice-box">
+                <h2>STATUS: ELIMINATED</h2>
+                <p>I'm sorry, but you have been eliminated from the race.</p>
+            </div>
+            
+            <p>Your performance in the Pre-Race Training did not meet the requirements to proceed to the next leg.</p>
+            <p style="font-size: 1.1rem; color: var(--text-muted); font-style: italic;">Understanding the mission rules is essential for the competition. We sincerely appreciate your time and effort. Safe travels.</p>
+            
+            <div class="contact-box">
+                <h3>Contact & Support</h3>
+                <p>If you have any questions regarding this decision:</p>
+                <a href="mailto:shelll@post.bgu.ac.il" class="email-link">shelll@post.bgu.ac.il</a>
+                <a href="mailto:hajajer@post.bgu.ac.il" class="email-link">hajajer@post.bgu.ac.il</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const imgElement = document.getElementById('globeImage');
+    const formats = ['png', 'jpg', 'jpeg', 'webp'];
+    let formatIndex = 0;
+
+    const base = "{{ url_for('static', filename='globe') }}";
+
+    imgElement.onerror = function() {
+        formatIndex++;
+        if (formatIndex < formats.length) {
+            this.src = base + "." + formats[formatIndex];
+        } else {
+            this.style.display = 'none';
+        }
+    };
+</script>
+
+</body>
+</html>

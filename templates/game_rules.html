@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>The Amazing Race - Instructions</title>
+    
+    <style>
+        :root {
+            --gold: #f5c842;
+            --gold-light: #ffe999;
+            --blue-deep: #020c22;
+            --race-blue: #2563eb; 
+            --text-dark: #1a1a1a;
+            --text-light: #eef3ff;
+            --env-yellow: #fdd835;
+            --env-black: #1a1a1a;
+            --env-red: #d32f2f;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            min-height: 100vh;
+            font-family: 'Barlow', sans-serif;
+            color: var(--text-light);
+            background-color: var(--blue-deep);
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        .bg {
+            position: fixed; inset: 0; z-index: -1;
+            background-image:
+                radial-gradient(circle at 80% 20%, rgba(0, 150, 255, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 20% 80%, rgba(30, 80, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 15% 15%, #fff 2px, transparent 0),
+                radial-gradient(circle at 85% 20%, #fff 2px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 250px 250px;
+        }
+
+        .page {
+            position: relative; z-index: 10;
+            width: min(900px, 95vw);
+            margin: 40px auto;
+            text-align: center;
+        }
+
+        .main-logo {
+            width: 150px;
+            filter: drop-shadow(0 0 15px rgba(245,200,66,0.5));
+            margin-bottom: 20px;
+        }
+
+        /* ── INITIAL YELLOW ENVELOPE ── */
+        .envelope-container {
+            perspective: 1000px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .envelope {
+            position: relative;
+            width: 340px;
+            height: 200px;
+            background-color: var(--env-yellow);
+            border-radius: 4px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .route-strip {
+            position: absolute;
+            width: 100%;
+            height: 50px;
+            background-color: var(--env-black);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .route-text {
+            color: var(--gold);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .envelope.opened {
+            transform: translateY(150px) rotateX(10deg);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ── BLUE ROUTE INFO BOX ── */
+        #instructions-card {
+            display: none;
+            background-color: var(--race-blue);
+            border: 12px solid #fff; 
+            border-radius: 2px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            animation: slideIn 0.8s ease-out;
+            overflow: hidden;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-top-section {
+            background-color: var(--race-blue);
+            padding: 20px 0;
+            border-bottom: 6px solid #fff;
+        }
+
+        .card-icons {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 10px;
+        }
+
+        .card-icons span {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .route-info-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 3.5rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+        }
+
+        .inner-content {
+            padding: 40px;
+            background-color: #fdfaf3; 
+            text-align: left;
+            color: var(--text-dark);
+        }
+
+        .section h2 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.8rem;
+            color: var(--env-red);
+            text-transform: uppercase;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 12px;
+            padding-bottom: 5px;
+        }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 20px 0; }
+        p, li { font-size: 1.1rem; line-height: 1.6; margin-bottom: 10px; }
+        ul { margin-left: 20px; }
+        strong { color: #000; }
+
+        .btn-container {
+            text-align: center;
+            padding: 30px;
+            background: #fdfaf3;
+        }
+
+        .start-btn {
+            display: inline-flex;
+            padding: 18px 50px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #c8960a, #f5c842, #c8960a);
+            color: #000;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-decoration: none;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .start-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .notice-banner {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid var(--race-blue);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<audio id="raceMusic" preload="auto">
+    <source src="{{ url_for('static', filename='theme_music.mp3') }}" type="audio/mpeg">
+</audio>
+
+<div class="page">
+    <img src="{{ url_for('static', filename='Gemini_Generated_Image_v2v29lv2v29lv2v2.png') }}" alt="Logo" class="main-logo">
+
+    <div class="envelope-container" id="env-wrap" onclick="openInstructions()">
+        <div class="envelope">
+            <div class="route-strip">
+                <span class="route-text">ROUTE INFO</span>
+            </div>
+            <p style="position:absolute; bottom:20px; color:#000; font-family:'Barlow Condensed'; font-weight:800; font-size:0.9rem; text-transform:uppercase;">Click to Reveal Instructions</p>
+        </div>
+    </div>
+
+    <div id="instructions-card">
+        <div class="card-top-section">
+            <div class="card-icons">
+                <span>✈️</span>
+                <span>🚗</span>
+                <span>🚆</span>
+                <span>🚢</span>
+            </div>
+            <div class="route-info-title">ROUTE INFO</div>
+        </div>
+
+        <div class="inner-content">
+            <div class="section">
+                <h2>Budget and Outcomes</h2>
+                <p>You begin with <strong>$2</strong>. Choosing to invest costs <strong>$0.5</strong>.</p>
+                <ul>
+                    <li>If you invest and the project succeeds, you will earn an additional $0.5, for a total of <strong>$2.5</strong>.</li>
+                    <li>If you invest and the project fails, you will lose the $0.5 you invested, for a total of <strong>$1.5</strong>.</li>
+                    <li>If you do not invest, you will keep your <strong>$2</strong>.</li>
+                </ul>
+            </div>
+
+            <div class="grid">
+                <div class="section">
+                    <h2>Private Information</h2>
+                    <p>You will observe one ball drawn from a jar containing 100 balls. One color is in the majority, but you do not know which one.</p>
+                </div>
+                <div class="section">
+                    <h2>Public Information</h2>
+                    <p>In Phase 1, you will see previous participants’ decisions and their position in the sequence. In Phase 2, you will also see confidence information.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Decision Process</h2>
+                <ul>
+                    <li><strong>Phase 1:</strong> Decide whether to invest and report your confidence level.</li>
+                    <li><strong>Phase 2:</strong> See added confidence information and make a final decision.</li>
+                    <li>You may keep your original choice or change it.</li>
+                </ul>
+            </div>
+
+            <div class="grid">
+                <div class="section">
+                    <h2>Project Success</h2>
+                    <p>The project succeeds if the majority color in the jar is blue <strong>AND</strong> the number of investors reaches the required threshold.</p>
+                </div>
+                <div class="section">
+                    <h2>Project Failure</h2>
+                    <p>The project fails if the majority color in the jar is red, <strong>OR</strong> if the number of investors is below the required threshold.</p>
+                </div>
+            </div>
+
+            <div class="notice-banner">
+                At any stage, you may click the <strong>Mission Brief</strong> button to view these rules again.
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <form action="/start_experiment" method="GET">
+                <button class="start-btn" id="start-btn" disabled>Start Experiment (10)</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openInstructions() {
+        const music = document.getElementById('raceMusic');
+        const envWrap = document.getElementById('env-wrap');
+        const card = document.getElementById('instructions-card');
+        const startBtn = document.getElementById('start-btn');
+        let sec = 10;
+        
+        // 1. Play Music
+        music.volume = 0.6;
+        music.play().catch(error => {
+            console.log("Autoplay was prevented, but it should work on click:", error);
+        });
+
+        // 2. Animate Envelope
+        envWrap.querySelector('.envelope').classList.add('opened');
+        
+        setTimeout(() => {
+            envWrap.style.display = 'none';
+            card.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // 3. Start Timer
+            const timer = setInterval(() => {
+                sec--;
+                startBtn.innerText = "Start Experiment (" + sec + ")";
+                if (sec <= 0) {
+                    clearInterval(timer);
+                    startBtn.disabled = false;
+                    startBtn.innerText = "Start Experiment →";
+                }
+            }, 1000);
+        }, 600);
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>The Amazing Race - Pit Stop</title>
+    
+    <style>
+        :root {
+            --gold: #f5c842;
+            --gold-light: #ffe999;
+            --gold-dark: #c8960a;
+            --cyan: #00c8ff;
+            --blue-deep: #020c22;
+            --text: #eef3ff;
+            --text-muted: #8da0c4;
+            --card-overlay: rgba(6, 12, 34, 0.95);
+            --gold-glow: rgba(245,200,66,0.4);
+            --env-red: #d32f2f;
+            --env-yellow: #fdd835;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            min-height: 100vh;
+            font-family: 'Barlow', sans-serif;
+            color: var(--text);
+            background-color: var(--blue-deep);
+            display: flex;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        /* ── MAXIMUM STARFIELD BACKGROUND ── */
+        .bg {
+            position: fixed; inset: 0; z-index: -1;
+            background-image:
+                radial-gradient(circle at 80% 20%, rgba(0, 150, 255, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 20% 80%, rgba(30, 80, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 15% 15%, #fff 2px, transparent 0),
+                radial-gradient(circle at 85% 20%, #fff 2px, transparent 0),
+                radial-gradient(circle at 50% 80%, #fff 2px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 250px 250px, 350px 350px;
+        }
+
+        .page {
+            position: relative; z-index: 10;
+            width: min(900px, 95vw);
+            margin: 30px auto;
+            animation: up 1s ease-out;
+        }
+        @keyframes up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ── HEADER WITH GLOBE (Left) ── */
+        .hero { 
+            display: flex; align-items: center; justify-content: flex-start; 
+            width: 100%; 
+            background: linear-gradient(to bottom, rgba(8,14,50,0.85), rgba(4,7,18,0.95));
+            border: 2px solid var(--gold); border-radius: 24px;
+            padding: 30px; margin-bottom: 25px;
+            gap: 25px;
+            box-shadow: 0 0 30px var(--gold-glow);
+        }
+        
+        .globe-container {
+            width: 180px; height: 120px; flex-shrink: 0;
+            overflow: hidden; border-radius: 8px; border: 2px solid var(--gold);
+        }
+
+        .globe-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .header-text { text-align: left; }
+
+        .eyebrow {
+            display: inline-block; padding: 4px 12px; border-radius: 4px;
+            background: var(--env-red); color: #fff; font-family: 'Barlow Condensed';
+            font-size: 0.9rem; font-weight: 800; text-transform: uppercase;
+            margin-bottom: 8px; letter-spacing: 1px;
+        }
+
+        h1 {
+            font-family: 'Barlow Condensed', sans-serif; font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+            font-weight: 900; color: var(--gold-light); text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        .pitstop-container { text-align: center; margin-bottom: 30px; }
+        .pitstop-img {
+            width: 100%; max-width: 650px; border-radius: 15px;
+            border: 3px solid var(--gold); margin: 20px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        }
+
+        /* ── CONTENT GRID ── */
+        .grid { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; margin-bottom: 30px; position: relative; padding: 0 30px; }
+        
+        .flag-side {
+            position: absolute; top: 0; bottom: 0; width: 10px;
+            background: linear-gradient(to bottom, var(--env-red) 33%, var(--env-yellow) 33%, var(--env-yellow) 66%, #000 66%);
+            border-radius: 2px;
+        }
+        .flag-left { left: 0; }
+        .flag-right { right: 0; }
+
+        .card { 
+            background: var(--card-overlay); padding: 25px; border-radius: 15px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+        }
+        .card.full { grid-column: 1 / -1; }
+        
+        h2 { 
+            font-family: 'Barlow Condensed'; color: var(--gold); font-size: 1.5rem; 
+            text-transform: uppercase; margin-bottom: 12px; border-bottom: 1px solid rgba(245,200,66,0.2); 
+            padding-bottom: 5px;
+        }
+        
+        p { line-height: 1.6; margin-bottom: 15px; font-size: 1.05rem; }
+        ul { margin-left: 20px; margin-bottom: 15px; }
+        li { margin-bottom: 8px; color: var(--text-muted); }
+
+        /* ── CODE BOX ── */
+        .code-section {
+            background: linear-gradient(135deg, rgba(245,200,66,0.1), rgba(0,200,255,0.05));
+            border: 2px dashed var(--gold); border-radius: 15px;
+            padding: 25px; text-align: center; margin: 15px 0;
+        }
+        .code-box {
+            font-family: 'Barlow Condensed'; font-size: 3.5rem; font-weight: 900;
+            color: var(--gold-light); letter-spacing: 5px; text-shadow: 0 0 20px var(--gold-glow);
+            margin: 10px 0;
+        }
+
+        .footer { text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.9rem; }
+
+        @media (max-width: 768px) { 
+            .hero { flex-direction: column; text-align: center; }
+            .header-text { text-align: center; }
+            .grid { grid-template-columns: 1fr; padding: 0 15px; } 
+            .flag-side { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="page">
+    <div class="hero">
+        <div class="globe-container">
+            <img src="{{ url_for('static', filename='globe.png') }}" id="globeImage" alt="Race Globe" class="globe-img">
+        </div>
+        <div class="header-text">
+            <div class="eyebrow">✅ Destination Reached</div>
+            <h1>You've Made it to the Pit Stop!</h1>
+            <p style="color: var(--gold); font-weight: 700; margin-top: 5px; text-transform: uppercase;">
+                Congratulations! Mission Accomplished.
+            </p>
+        </div>
+    </div>
+
+    <div class="pitstop-container">
+        <img id="pitstopImg" src="{{ url_for('static', filename='pitstop.png') }}" alt="Pit Stop" class="pitstop-img">
+    </div>
+
+    <div class="grid">
+        <div class="flag-side flag-left"></div>
+        <div class="flag-side flag-right"></div>
+
+        <div class="card">
+            <h2>Important Information</h2>
+            <p>In order to create a realistic environment, some aspects were intentionally simulated:</p>
+            <ul>
+                <li>Decisions of other participants</li>
+                <li>Their confidence levels</li>
+                <li>The specific scenarios presented</li>
+            </ul>
+            <p>This design ensures controlled experimental conditions for our study.</p>
+        </div>
+
+        <div class="card">
+            <h2>Payment & Rewards</h2>
+            <p>Regardless of in-game outcomes, all participants receive a <strong>fixed payment of $2.5</strong>.</p>
+            <p>This ensures fair compensation while we analyze decision-making patterns.</p>
+            <div style="margin-top: 15px; border-left: 3px solid var(--cyan); padding-left: 12px;">
+                <p style="font-size: 0.9rem; margin-bottom: 0;"><strong>Inquiries:</strong><br>
+                hajajer@post.bgu.ac.il | shelll@post.bgu.ac.il</p>
+            </div>
+        </div>
+
+        <div class="card full">
+            <div class="code-section">
+                <h2>Your Completion Code</h2>
+                <div class="code-box">{{ password }}</div>
+                <p style="color: var(--gold); font-weight: 700; text-transform: uppercase;">
+                    Submit this code on Prolific to claim your reward.
+                </p>
+            </div>
+            <p style="text-align: center; font-weight: 600; margin-top: 10px;">
+                Thank you for participating in this Amazing Race research leg!
+            </p>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 The Amazing Race - Academic Decision Study
+    </div>
+</div>
+
+<script>
+    const globeImg = document.getElementById('globeImage');
+    const pitstopImg = document.getElementById('pitstopImg');
+    const formats = ['png', 'jpg', 'jpeg'];
+
+    const globeBase = "{{ url_for('static', filename='globe') }}";
+    const pitstopBase = "{{ url_for('static', filename='pitstop') }}";
+
+    function handleFallback(img, baseName, index) {
+        if (index >= formats.length) return;
+        img.src = baseName + '.' + formats[index];
+        img.onerror = () => handleFallback(img, baseName, index + 1);
+    }
+
+    globeImg.onerror = () => handleFallback(globeImg, globeBase, 0);
+    pitstopImg.onerror = () => handleFallback(pitstopImg, pitstopBase, 0);
+</script>
+
+</body>
+</html>

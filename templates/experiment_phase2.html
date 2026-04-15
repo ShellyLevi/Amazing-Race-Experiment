@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Decision Task - Phase 2</title>
+    
+    <style>
+        :root {
+            --gold: #f5c842;
+            --gold-light: #ffe999;
+            --gold-dark: #c8960a;
+            --cyan: #00c8ff;
+            --blue-deep: #020c22;
+            --text: #eef3ff;
+            --text-muted: #8da0c4;
+            --card-overlay: rgba(6, 12, 34, 0.9);
+            --gold-glow: rgba(245,200,66,0.4);
+            --env-red: #d32f2f;
+            --env-yellow: #fdd835;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            min-height: 100vh;
+            font-family: 'Barlow', sans-serif;
+            color: var(--text);
+            background-color: var(--blue-deep);
+            display: flex;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .bg {
+            position: fixed; inset: 0; z-index: -1;
+            background-image:
+                radial-gradient(circle at 80% 20%, rgba(0, 150, 255, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 20% 80%, rgba(30, 80, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 15% 15%, #fff 2px, transparent 0),
+                radial-gradient(circle at 85% 20%, #fff 2px, transparent 0),
+                radial-gradient(circle at 50% 80%, #fff 2px, transparent 0),
+                radial-gradient(circle at 25% 45%, #fff 1px, transparent 0),
+                radial-gradient(circle at 70% 75%, #fff 1px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 250px 250px, 350px 350px, 180px 180px;
+        }
+
+        .page {
+            position: relative; z-index: 10;
+            width: min(900px, 95vw);
+            margin: 30px auto;
+            animation: up 0.7s ease-out;
+        }
+        @keyframes up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hero {
+            background: linear-gradient(to bottom, rgba(8,14,50,0.8), rgba(4,7,18,0.95));
+            border: 1px solid var(--gold); border-radius: 20px;
+            padding: 30px; text-align: center; margin-bottom: 25px;
+        }
+        .main-logo { width: 160px; filter: drop-shadow(0 0 15px var(--gold-glow)); margin-bottom: 15px; }
+        h1 { font-family: 'Barlow Condensed'; font-size: 2.5rem; font-weight: 900; color: var(--gold-light); text-transform: uppercase; }
+
+        .mission-brief-text {
+            background: rgba(255, 255, 255, 0.05); border-top: 2px solid var(--env-red); border-bottom: 2px solid var(--env-red);
+            padding: 20px; margin: 20px 0; text-align: center; font-style: italic; line-height: 1.6; font-size: 1.1rem;
+        }
+
+        .status-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.05); padding: 15px 25px;
+            border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;
+        }
+        .step { font-family: 'Barlow Condensed'; font-weight: 700; text-transform: uppercase; padding: 5px 15px; border-radius: 5px; color: var(--text-muted); }
+        .step.active { color: var(--gold); border: 1px solid var(--gold); background: rgba(245,200,66,0.1); }
+        
+        .reminder-btn { 
+            background: rgba(245,200,66,0.1); color: var(--gold); border: 1px solid var(--gold); 
+            padding: 8px 18px; border-radius: 50px; cursor: pointer; 
+            font-family: 'Barlow Condensed'; font-weight: 700; text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .reminder-btn:hover { background: var(--gold); color: #000; }
+
+        .grid { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; margin-bottom: 20px; }
+        .card { background: var(--card-overlay); padding: 25px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .card.highlight-card { border-left: 5px solid var(--gold); }
+        .card h2 { font-family: 'Barlow Condensed'; color: var(--cyan); font-size: 1.4rem; text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid rgba(0,200,255,0.2); }
+        .metric-val { font-size: 1.6rem; font-weight: 900; color: var(--gold); margin-top: 5px; }
+        .highlight { color: var(--gold); font-weight: 800; }
+        .notice {
+            background: rgba(211,47,47,0.1); border: 1px solid var(--env-red);
+            padding: 10px; border-radius: 8px; font-size: 0.9rem; margin-top: 10px;
+        }
+
+        .clue-envelope {
+            position: relative; background: var(--env-yellow); height: 160px; border-radius: 4px;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4); margin-bottom: 25px; transition: 0.3s;
+        }
+        .clue-envelope::before { content: ''; position: absolute; top: 0; width: 100%; height: 12px; background: repeating-linear-gradient(45deg, var(--env-red), var(--env-red) 10px, #fff 10px, #fff 20px); }
+        .clue-label { font-family: 'Barlow Condensed'; font-weight: 900; font-size: 1.5rem; color: #000; text-transform: uppercase; margin-bottom: 10px; }
+
+        .envelope-btn {
+            background: #000; color: var(--gold); border: 2px solid var(--gold);
+            padding: 8px 16px; border-radius: 4px; font-family: 'Barlow Condensed';
+            font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .envelope-btn:hover { background: var(--gold); color: #000; }
+
+        #decision-form-container { display: none; animation: fadeIn 0.5s; }
+        .form-card { background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(20,20,20,0.8)); border: 2px solid var(--gold); padding: 30px; border-radius: 20px; }
+        .option { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; }
+        .btn { width: 100%; background: var(--gold); color: #000; border: none; padding: 18px; border-radius: 50px; font-family: 'Barlow Condensed'; font-size: 1.4rem; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .btn:disabled { background: #444; color: #888; cursor: not-allowed; }
+
+        #reasoning-section textarea {
+            width: 100%; height: 100px; background: rgba(0,0,0,0.5); border: 1px solid var(--gold);
+            color: white; padding: 15px; border-radius: 10px; font-family: inherit; font-size: 1rem; margin: 15px 0;
+            resize: none;
+        }
+        #word-count-msg { font-size: 0.85rem; color: var(--gold-light); margin-bottom: 10px; }
+
+        .modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.85); padding: 20px; overflow-y: auto; }
+        .modal-content { background: #eef3ff; color: #020c22; max-width: 700px; margin: 40px auto; padding: 40px; border-radius: 20px; position: relative; }
+        .close { position: absolute; right: 20px; top: 15px; font-size: 30px; cursor: pointer; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="page">
+    <div class="hero">
+        <img src="{{ url_for('static', filename='Gemini_Generated_Image_v2v29lv2v29lv2v2.png') }}" alt="Mission Logo" class="main-logo">
+        <h1>Decision Task — Phase 2</h1>
+        <div class="mission-brief-text">
+            As part of your mission in the Amazing Race, you must complete this mission to reach the Pit Stop. You now have access to additional confidence information. Review it carefully before making your final decision. The race is on!
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <div class="stepper">
+            <span class="step">Phase 1</span>
+            <span class="step active">Phase 2</span>
+        </div>
+        <button type="button" class="reminder-btn" onclick="openReminder()">MISSION BRIEF 📂</button>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>Private Information</h2>
+            <div class="metric-val">{{ color }}</div>
+            <p style="margin-top:5px; font-size: 0.85rem; color: var(--text-muted);">Your original signal remains valid.</p>
+        </div>
+        <div class="card">
+            <h2>Public Information</h2>
+            <p>Participant ID: <span class="highlight">{{ position }}</span>/15</p>
+            <p>Invested: <span class="highlight">{{ investors_blue }}</span> | Refused: <span class="highlight">{{ investors_not_blue }}</span></p>
+            
+            <div class="notice">
+                {% if investment_threshold %}
+                    Project success requires at least <strong>{{ investment_threshold }}</strong> investors.
+                {% else %}
+                    Project success requires a majority vote.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="grid" style="margin-bottom: 25px;">
+        <div class="card highlight-card">
+            <h2>Your Phase 1 Choice</h2>
+            <p>Decision: <span class="highlight">{{ initial_decision }}</span></p>
+            <p>Confidence: <span class="highlight">{{ initial_confidence }}</span></p>
+        </div>
+        
+        <div id="env-confidence" class="clue-envelope" onclick="revealConfidence()">
+            <div class="clue-label">Group Confidence Clue ✉️</div>
+            <button class="envelope-btn">Press Here To Open</button>
+        </div>
+
+        <div id="card-confidence" class="card" style="display:none; border-color: var(--gold);">
+            <h2>Group Confidence Data</h2>
+            <p>Investors' confidence: <span class="highlight">{{ invest_confidence }}</span></p>
+            <p>Non-investors' confidence: <span class="highlight">{{ not_invest_confidence }}</span></p>
+        </div>
+    </div>
+
+    <div id="decision-form-container">
+        <form id="main-race-form" action="{{ url_for('submit_social_learning') }}" method="post" class="form-card">
+            <input type="hidden" name="row" value="{{ row }}">
+            <h2 style="font-family: 'Barlow Condensed'; color: var(--gold); margin-bottom: 15px; text-transform: uppercase;">Final Decision</h2>
+            <p style="margin-bottom: 15px;">Based on the new data, will you stick to your choice or change strategy?</p>
+
+            <div class="options">
+                <label class="option"><input type="radio" name="decision" value="Invest" required><span>I choose to invest $0.5</span></label>
+                <label class="option"><input type="radio" name="decision" value="Do Not Invest" required><span>I choose not to invest</span></label>
+            </div>
+
+            <button type="button" id="btn" class="btn" disabled onclick="showReasoning()">Submit Final Decision (10)</button>
+
+            <div id="reasoning-section" style="display: none; margin-top: 25px; border-top: 1px solid var(--gold); padding-top: 20px;">
+                <h2 style="font-family: 'Barlow Condensed'; color: var(--gold); font-size: 1.4rem;">Explain Your Choice 🎥</h2>
+                <p style="font-size: 0.95rem; margin-bottom: 10px; font-style: italic;">Briefly explain your strategy: Why did you choose this action?</p>
+                
+                <textarea id="reasoning-text" name="reasoning" required placeholder="Ex: I changed my strategy because the group confidence was..."></textarea>
+                
+                <p id="word-count-msg"></p>
+                
+                <button type="submit" id="final-submit" class="btn" disabled>Confirm & Continue to Pit Stop →</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="reminderModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeReminder()">&times;</span>
+        <h2 style="font-family: 'Barlow Condensed'; color: var(--env-red); text-transform: uppercase;">Mission Briefing</h2>
+        <div style="margin-top: 15px;">
+            <p><b>Investment Details:</b></p>
+            <ul>
+                <li>Investment Cost: $0.5 (Budget: $2.0)</li>
+                <li>Project Success: Earn +$0.5 (Total $2.5)</li>
+                <li>Project Failure: Lose -$0.5 (Total $1.5)</li>
+                <li>No Investment: Retain $2.0</li>
+            </ul>
+            <p style="margin-top:15px;"><b>Success Conditions:</b></p>
+            <p>The project succeeds ONLY if the investment threshold is reached AND the dominant jar color is Blue.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function revealConfidence() {
+        document.getElementById('env-confidence').style.display = 'none';
+        document.getElementById('card-confidence').style.display = 'block';
+        document.getElementById('decision-form-container').style.display = 'block';
+        startTimer();
+    }
+
+    function startTimer() {
+        let sec = 10;
+        const btn = document.getElementById("btn");
+        const timer = setInterval(() => {
+            sec--;
+            btn.innerText = "Submit Final Decision (" + sec + ")";
+            if (sec <= 0) {
+                clearInterval(timer);
+                btn.disabled = false;
+                btn.innerText = "Submit Final Decision";
+            }
+        }, 1000);
+    }
+
+    function showReasoning() {
+        const options = document.getElementsByName('decision');
+        let selected = false;
+        for (const opt of options) { if (opt.checked) selected = true; }
+        
+        if (!selected) {
+            alert("Please choose an action first!");
+            return;
+        }
+
+        document.getElementById('reasoning-section').style.display = 'block';
+        document.getElementById('btn').style.display = 'none';
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    const textarea = document.getElementById('reasoning-text');
+    const finalBtn = document.getElementById('final-submit');
+    const msg = document.getElementById('word-count-msg');
+
+    textarea.addEventListener('input', function() {
+        const words = this.value.trim().split(/\s+/).filter(w => w.length > 0);
+        if (words.length < 5) {
+            finalBtn.disabled = true;
+            msg.innerText = "Please write at least " + (5 - words.length) + " more words.";
+        } else {
+            finalBtn.disabled = false;
+            msg.innerText = "Strategy recorded. You are ready to submit.";
+        }
+    });
+
+    function openReminder() { document.getElementById("reminderModal").style.display = "block"; }
+    function closeReminder() { document.getElementById("reminderModal").style.display = "none"; }
+    window.onclick = (e) => { if (e.target.id === "reminderModal") closeReminder(); }
+</script>
+</body>
+</html>

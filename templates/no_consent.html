@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>The Amazing Race - Eliminated</title>
+    
+    <style>
+        :root {
+            --gold: #f5c842;
+            --gold-light: #ffe999;
+            --blue-deep: #020c22;
+            --text: #eef3ff;
+            --text-muted: #8da0c4;
+            --card-overlay: rgba(6, 12, 34, 0.95);
+            --env-red: #d32f2f;
+            --env-yellow: #fdd835;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            min-height: 100vh;
+            font-family: 'Barlow', sans-serif;
+            color: var(--text);
+            background-color: var(--blue-deep);
+            display: flex;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        /* ── MAXIMUM STARFIELD BACKGROUND ── */
+        .bg {
+            position: fixed; inset: 0; z-index: -1;
+            background-image:
+                radial-gradient(circle at 80% 20%, rgba(0, 150, 255, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 20% 80%, rgba(30, 80, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 15% 15%, #fff 2px, transparent 0),
+                radial-gradient(circle at 85% 20%, #fff 2px, transparent 0),
+                radial-gradient(circle at 50% 80%, #fff 2px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0),
+                radial-gradient(white 0.5px, transparent 0);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 250px 250px, 350px 350px;
+        }
+
+        .page {
+            position: relative; z-index: 10;
+            width: min(850px, 95vw);
+            margin: 40px auto;
+            animation: up 0.7s ease-out;
+        }
+        @keyframes up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hero {
+            text-align: center; margin-bottom: 30px;
+        }
+        .main-logo { 
+            width: 160px; 
+            filter: drop-shadow(0 0 15px rgba(245,200,66,0.4)); 
+            margin-bottom: 20px; 
+        }
+
+        h1 {
+            font-family: 'Barlow Condensed', sans-serif; font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900; color: #fff; text-transform: uppercase;
+            margin-bottom: 10px; line-height: 1.1;
+        }
+
+        /* ── THE RACE CARD WITH SIDE FLAGS ── */
+        .race-container {
+            position: relative;
+            padding: 0 40px;
+        }
+
+        .flag-side {
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 15px;
+            background: linear-gradient(to bottom, var(--env-red) 33%, var(--env-yellow) 33%, var(--env-yellow) 66%, #000 66%);
+            border-radius: 2px;
+        }
+        .flag-left { left: 15px; }
+        .flag-right { right: 15px; }
+
+        .content-card {
+            background: var(--card-overlay);
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        h2 { 
+            font-family: 'Barlow Condensed'; color: var(--gold); 
+            font-size: 1.8rem; text-transform: uppercase; margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        p { line-height: 1.7; margin-bottom: 20px; font-size: 1.2rem; color: var(--text); }
+        
+        .contact-box {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-top: 2px solid var(--gold);
+        }
+        
+        .contact-box p { font-size: 1rem; color: var(--text-muted); margin-bottom: 5px; }
+        .email-link { color: var(--gold-light); font-weight: 600; text-decoration: none; display: block; margin-top: 5px; }
+
+    </style>
+    
+    <script>
+        history.pushState(null, "", location.href);
+        window.onpopstate = function () {
+            history.pushState(null, "", location.href);
+        };
+    </script>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="page">
+    <div class="hero">
+        <img src="{{ url_for('static', filename='Gemini_Generated_Image_v2v29lv2v29lv2v2.png') }}" alt="Mission Logo" class="main-logo">
+        <h1>Thank You</h1>
+        <p style="color: var(--text-muted); font-style: italic;">We appreciate your interest in the study.</p>
+    </div>
+
+    <div class="race-container">
+        <div class="flag-side flag-left"></div>
+        <div class="flag-side flag-right"></div>
+
+        <div class="content-card">
+            <h2>Status Update: Eliminated</h2>
+            <p><strong>Unfortunately, The Amazing Race has ended for you.</strong></p>
+            <p>As you have chosen not to continue with this study, you have been eliminated from the competition. We respect your decision to exit the race.</p>
+            
+            <p style="font-size: 1rem; color: var(--text-muted);">No further action is required from your side. Safe travels.</p>
+            
+            <div class="contact-box">
+                <h2>Contact & Support</h2>
+                <p>If you have any questions regarding your exit from the study or the research process:</p>
+                <a href="mailto:shelll@post.bgu.ac.il" class="email-link">shelll@post.bgu.ac.il</a>
+                <a href="mailto:hajajer@post.bgu.ac.il" class="email-link">hajajer@post.bgu.ac.il</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
