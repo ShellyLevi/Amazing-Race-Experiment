@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import pandas as pd
+from pandas.errors import EmptyDataError
 import pytz
 from filelock import FileLock
 from datetime import datetime
@@ -61,7 +62,7 @@ def pick_one_row_for_participant():
 
         try:
             df_output = pd.read_csv(file_path_output)
-        except FileNotFoundError:
+        except (FileNotFoundError, EmptyDataError):
             df_output = pd.DataFrame()
 
         if 'RowID' in df_output.columns:
@@ -142,7 +143,7 @@ def save_results_to_output(
     with FileLock(output_lock_file_path):
         try:
             df_output = pd.read_csv(file_path_output)
-        except FileNotFoundError:
+        except (FileNotFoundError, EmptyDataError):
             df_output = pd.DataFrame()
 
         df_output = ensure_output_columns(df_output)
@@ -457,7 +458,7 @@ def final():
         else:
             encrypted_password = "No password found"
 
-    except FileNotFoundError:
+    except (FileNotFoundError, EmptyDataError):
         encrypted_password = "No password found"
 
     return render_template('final.html', password=encrypted_password)
