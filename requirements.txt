@@ -1,0 +1,7 @@
+flask
+pandas
+openpyxl
+gunicorn
+pytz
+filelock
+cryptography
