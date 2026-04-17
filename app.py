@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_file
 import pandas as pd
 import pytz
 from filelock import FileLock
@@ -24,6 +24,16 @@ output_lock_file_path = os.path.join(DATA_DIR, 'output.lock')
 # חשוב: תחליפי למפתחות אמיתיים
 encryption_key = b'Sixteen byte key'
 app.secret_key = 'replace_with_real_secret_key'
+
+ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "replace_this_with_a_long_secret_token")
+
+
+# =========================
+# Admin helpers
+# =========================
+def is_admin_request():
+    token = request.args.get("token", "")
+    return token == ADMIN_TOKEN
 
 
 # =========================
@@ -139,7 +149,7 @@ def save_results_to_output(
     initial_confidence: str,
     final_decision: str,
     group_num: int,
-    decision_explanation: str   # 👈 חדש
+    decision_explanation: str
 ):
     """
     שומר את תוצאות הניסוי ל-output.xlsx
@@ -167,11 +177,11 @@ def save_results_to_output(
         df_output.at[next_empty_row, 'InitialDecision'] = str(initial_decision)
         df_output.at[next_empty_row, 'InitialConfidence'] = str(initial_confidence)
         df_output.at[next_empty_row, 'FinalDecision'] = str(final_decision)
-        df_output.at[next_empty_row, 'UserID'] = input_user_id
+        df_output.at[next_empty_row, 'UserID'] = str(input_user_id)
         df_output.at[next_empty_row, 'RowID'] = str(row_id)
         df_output.at[next_empty_row, 'GroupNum'] = str(group_num)
         df_output.at[next_empty_row, 'GeneratedPassword-סיסמה לתשלום'] = str(encrypted_password)
-        df_output.at[next_empty_row, 'ProlificCode'] = participant_id
+        df_output.at[next_empty_row, 'ProlificCode'] = str(participant_id)
         df_output.at[next_empty_row, 'DecisionExplanation'] = str(decision_explanation)
 
         df_output.to_excel(file_path_output, index=False)
@@ -434,7 +444,7 @@ def submit_social_learning():
         initial_confidence=initial_confidence,
         final_decision=final_decision,
         group_num=group_num,
-        decision_explanation=decision_explanation  # 👈 חדש
+        decision_explanation=decision_explanation
     )
 
     session['experiment_completed'] = True
@@ -469,6 +479,45 @@ def final():
 
 
 # =========================
+# Admin routes
+# =========================
+@app.route('/admin-download')
+def admin_download():
+    if not is_admin_request():
+        return "Unauthorized", 403
+
+    if not os.path.exists(file_path_output):
+        return "No output file found.", 404
+
+    return send_file(file_path_output, as_attachment=True)
+
+
+@app.route('/admin-clear')
+def admin_clear():
+    if not is_admin_request():
+        return "Unauthorized", 403
+
+    with FileLock(output_lock_file_path):
+        empty_df = pd.DataFrame()
+        empty_df = ensure_output_columns(empty_df)
+        empty_df.to_excel(file_path_output, index=False)
+
+    return "Output file cleared successfully."
+
+
+@app.route('/admin-count')
+def admin_count():
+    if not is_admin_request():
+        return "Unauthorized", 403
+
+    if not os.path.exists(file_path_output):
+        return "0 rows saved"
+
+    df_output = pd.read_excel(file_path_output)
+    return f"{len(df_output)} rows saved"
+
+
+# =========================
 # Error handlers
 # =========================
 @app.errorhandler(500)
@@ -492,7 +541,6 @@ def handle_exception(error):
 # =========================
 # Run app
 # =========================
-
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
