@@ -119,6 +119,9 @@ def ensure_output_columns(df_output: pd.DataFrame) -> pd.DataFrame:
         'UserID',
         'GeneratedPassword-סיסמה לתשלום',
         'ProlificCode',
+        'DecisionExplanation',
+        'RowID',
+        'GroupNum',
     ]
 
     for col in text_columns:
