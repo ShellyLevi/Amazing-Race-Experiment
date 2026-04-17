@@ -14,9 +14,12 @@ app = Flask(__name__)
 # =========================
 # Files
 # =========================
-file_path = 'input.xlsx'
-file_path_output = 'output.xlsx'
-output_lock_file_path = 'output.lock'
+DATA_DIR = "/data"
+os.makedirs(DATA_DIR, exist_ok=True)
+
+file_path = 'input.xlsx'   # נשאר בתוך הפרויקט
+file_path_output = os.path.join(DATA_DIR, 'output.xlsx')
+output_lock_file_path = os.path.join(DATA_DIR, 'output.lock')
 
 # חשוב: תחליפי למפתחות אמיתיים
 encryption_key = b'Sixteen byte key'
