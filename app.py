@@ -165,8 +165,8 @@ def save_results_to_output(
         df_output.at[next_empty_row, 'InitialConfidence'] = str(initial_confidence)
         df_output.at[next_empty_row, 'FinalDecision'] = str(final_decision)
         df_output.at[next_empty_row, 'UserID'] = input_user_id
-        df_output.at[next_empty_row, 'RowID'] = row_id
-        df_output.at[next_empty_row, 'GroupNum'] = group_num
+        df_output.at[next_empty_row, 'RowID'] = str(row_id)
+        df_output.at[next_empty_row, 'GroupNum'] = str(group_num)
         df_output.at[next_empty_row, 'GeneratedPassword-סיסמה לתשלום'] = str(encrypted_password)
         df_output.at[next_empty_row, 'ProlificCode'] = participant_id
         df_output.at[next_empty_row, 'DecisionExplanation'] = str(decision_explanation)
