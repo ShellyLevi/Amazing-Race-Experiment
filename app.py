@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import pandas as pd
-from pandas.errors import EmptyDataError
 import pytz
 from filelock import FileLock
 from datetime import datetime
@@ -10,14 +9,13 @@ import base64
 import os
 
 
-
 app = Flask(__name__)
 
 # =========================
 # Files
 # =========================
 file_path = 'input.xlsx'
-file_path_output = 'output.csv'
+file_path_output = 'output.xlsx'
 output_lock_file_path = 'output.lock'
 
 # חשוב: תחליפי למפתחות אמיתיים
@@ -61,8 +59,8 @@ def pick_one_row_for_participant():
             raise ValueError("input.xlsx must contain a unique 'RowID' column")
 
         try:
-            df_output = pd.read_csv(file_path_output)
-        except (FileNotFoundError, EmptyDataError):
+            df_output = pd.read_excel(file_path_output)
+        except FileNotFoundError:
             df_output = pd.DataFrame()
 
         if 'RowID' in df_output.columns:
@@ -138,12 +136,12 @@ def save_results_to_output(
     decision_explanation: str   # 👈 חדש
 ):
     """
-    שומר את תוצאות הניסוי ל-output.csv
+    שומר את תוצאות הניסוי ל-output.xlsx
     """
     with FileLock(output_lock_file_path):
         try:
-            df_output = pd.read_csv(file_path_output)
-        except (FileNotFoundError, EmptyDataError):
+            df_output = pd.read_excel(file_path_output)
+        except FileNotFoundError:
             df_output = pd.DataFrame()
 
         df_output = ensure_output_columns(df_output)
@@ -170,7 +168,7 @@ def save_results_to_output(
         df_output.at[next_empty_row, 'ProlificCode'] = participant_id
         df_output.at[next_empty_row, 'DecisionExplanation'] = str(decision_explanation)
 
-        df_output.to_csv(file_path_output, index=False)
+        df_output.to_excel(file_path_output, index=False)
         print(f"✅ Saved row {next_empty_row + 1} for participant {participant_id}")
 
 
@@ -447,7 +445,7 @@ def final():
     participant_id = str(session.get('participant_id', 'Unknown'))
 
     try:
-        df_output = pd.read_csv(file_path_output)
+        df_output = pd.read_excel(file_path_output)
         df_output = ensure_output_columns(df_output)
         df_output['ProlificCode'] = df_output['ProlificCode'].fillna('').astype(str)
 
@@ -458,7 +456,7 @@ def final():
         else:
             encrypted_password = "No password found"
 
-    except (FileNotFoundError, EmptyDataError):
+    except FileNotFoundError:
         encrypted_password = "No password found"
 
     return render_template('final.html', password=encrypted_password)
