@@ -296,16 +296,34 @@
     <div class="modal-content">
         <span class="close" onclick="closeReminder()">&times;</span>
         <h2 style="font-family: 'Barlow Condensed'; color: var(--env-red); text-transform: uppercase;">Mission Briefing</h2>
+
         <div style="margin-top: 15px;">
-            <p><b>Investment Details:</b></p>
+            <p><b>Budget and Outcomes</b></p>
+            <p>You begin with <strong>$2</strong>. Choosing to invest costs <strong>$0.5</strong>.</p>
             <ul>
-                <li>Investment Cost: $0.5 (Budget: $2.0)</li>
-                <li>Project Success: Earn +$0.5 (Total $2.5)</li>
-                <li>Project Failure: Lose -$0.5 (Total $1.5)</li>
-                <li>No Investment: Retain $2.0</li>
+                <li>If you invest and the project succeeds, you will earn an additional $0.5, for a total of <strong>$2.5</strong>.</li>
+                <li>If you invest and the project fails, you will lose the $0.5 you invested, for a total of <strong>$1.5</strong>.</li>
+                <li>If you do not invest, you will keep your <strong>$2</strong>.</li>
             </ul>
-            <p style="margin-top:15px;"><b>Success Conditions:</b></p>
-            <p>The project succeeds ONLY if the investment threshold is reached AND the dominant jar color is Blue.</p>
+
+            <p style="margin-top:15px;"><b>Private Information</b></p>
+            <p>You will observe one ball drawn from a jar containing 100 balls. One color is in the majority, but you do not know which one.</p>
+
+            <p style="margin-top:15px;"><b>Public Information</b></p>
+            <p>In Phase 1, you will see previous participants’ decisions and their position in the sequence. In Phase 2, you will also see confidence information.</p>
+
+            <p style="margin-top:15px;"><b>Decision Process</b></p>
+            <ul>
+                <li><strong>Phase 1:</strong> Decide whether to invest and report your confidence level.</li>
+                <li><strong>Phase 2:</strong> See added confidence information and make a final decision.</li>
+                <li>You may keep your original choice or change it.</li>
+            </ul>
+
+            <p style="margin-top:15px;"><b>Project Success</b></p>
+            <p>The project succeeds if the majority color in the jar is blue <strong>AND</strong> the number of investors reaches the required threshold.</p>
+
+            <p style="margin-top:15px;"><b>Project Failure</b></p>
+            <p>The project fails if the majority color in the jar is red, <strong>OR</strong> if the number of investors is below the required threshold.</p>
         </div>
     </div>
 </div>
