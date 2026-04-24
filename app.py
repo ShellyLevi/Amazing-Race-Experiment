@@ -305,7 +305,7 @@ def check_training():
     ]
 
     if (
-        q1 != 'A' or
+        q1 != 'C' or
         q2 != 'Blue' or
         q3 != '5' or
         not q4 or
