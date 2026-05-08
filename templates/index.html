@@ -307,11 +307,13 @@
 
 <script>
     const audio = document.getElementById('bgm');
+    const clueText = document.getElementById('clueText');
     const excitedWrap = document.getElementById('excitedWrap');
 
     function startExperience() {
         audio.volume = 0.6;
         audio.play().catch(e => console.log("Audio waiting for interaction..."));
+        clueText.remove();
         
         excitedWrap.classList.add('fade-out');
         
