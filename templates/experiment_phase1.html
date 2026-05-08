@@ -260,11 +260,11 @@
             <p>Participant ID: <span class="highlight">{{ position }}</span>/15</p>
             <p>Invested: <span class="highlight">{{ investors_blue }}</span> | Refused: <span class="highlight">{{ investors_not_blue }}</span></p>
             <div style="background: rgba(211,47,47,0.1); border: 1px solid var(--env-red); padding: 8px; border-radius: 5px; font-size: 0.85rem; margin-top: 10px;">
-                {% if investment_threshold %}
-                    Requires <strong>{{ investment_threshold }}</strong> investors for success.
-                {% else %}
-                    Requires majority for success.
-                {% endif %}
+            {% if investment_threshold %}
+                Requires <strong>{{ investment_threshold }}</strong> investors for success and the majority color in the jar is blue.
+            {% else %}
+                Requires majority for success and the majority color in the jar is blue.
+            {% endif %}
             </div>
         </div>
     </div>
