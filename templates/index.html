@@ -194,6 +194,10 @@
             box-shadow: 0 5px 20px rgba(245,200,66,0.5);
             transition: 0.3s;
             text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             animation: pulse-gold 2s infinite;
         }
 
@@ -239,26 +243,6 @@
         .start-btn:hover { transform: translateY(-4px); box-shadow: 0 15px 50px rgba(245,200,66,0.7); }
 
         .center { text-align: center; }
-
-        .sound-icon {
-            position: absolute;
-            top: -75px;
-            font-size: 2.4rem;
-            animation: blink-sound 1s infinite;
-            z-index: 10;
-        }
-        
-        @keyframes blink-sound {
-            0%, 100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        
-            50% {
-                opacity: 0.35;
-                transform: scale(1.2);
-            }
-        }
         
     </style>
 </head>
@@ -288,9 +272,10 @@
             
             <div class="envelope-container envelope-wrap" id="excitedWrap">
                 <div class="envelope">
-                    <div class="sound-icon">🔊</div>
                     <div class="clue-card-peek">
-                        <button class="press-btn" onclick="startExperience()">Press Here</button>
+                        <button class="press-btn" onclick="startExperience()">
+                            🔊 Press Here
+                        </button>
                     </div>
                     <div class="route-strip">
                         <span class="route-text">THE AMAZING RACE</span>
