@@ -114,6 +114,7 @@ def ensure_output_columns(df_output: pd.DataFrame) -> pd.DataFrame:
         'GroupNum',
         'GeneratedPassword-סיסמה לתשלום',
         'ProlificCode',
+        'ProlificURL_ID',
     ]
 
     for col in needed_columns:
@@ -132,6 +133,7 @@ def ensure_output_columns(df_output: pd.DataFrame) -> pd.DataFrame:
         'DecisionExplanation',
         'RowID',
         'GroupNum',
+        'ProlificURL_ID',
     ]
 
     for col in text_columns:
@@ -170,6 +172,7 @@ def save_results_to_output(
         encrypted_password = encrypt_string(password, encryption_key)
 
         participant_id = str(session.get('participant_id', 'Unknown'))
+        prolific_url_id = str(session.get('prolific_url_id', ''))
         input_user_id = str(session.get('input_user_id', ''))
 
         df_output.at[next_empty_row, 'signal'] = str(signal)
@@ -182,6 +185,7 @@ def save_results_to_output(
         df_output.at[next_empty_row, 'GroupNum'] = str(group_num)
         df_output.at[next_empty_row, 'GeneratedPassword-סיסמה לתשלום'] = str(encrypted_password)
         df_output.at[next_empty_row, 'ProlificCode'] = str(participant_id)
+        df_output.at[next_empty_row, 'ProlificURL_ID'] = str(prolific_url_id)
         df_output.at[next_empty_row, 'DecisionExplanation'] = str(decision_explanation)
 
         df_output.to_excel(file_path_output, index=False)
@@ -240,6 +244,14 @@ def index():
 
 @app.route('/consent')
 def consent():
+    prolific_url_id = (
+        request.args.get("PROLIFIC_PID")
+        or request.args.get("prolific_pid")
+        or ""
+    )
+
+    session['prolific_url_id'] = prolific_url_id
+
     return render_template('consent.html')
 
 
@@ -253,8 +265,11 @@ def submit_consent():
     if request.form.get('consent') != 'agree':
         return redirect(url_for('no_consent'))
 
+    prolific_url_id = session.get('prolific_url_id', '')
+    
     session.clear()
     session['participant_id'] = participant_id
+    session['prolific_url_id'] = prolific_url_id
 
     try:
         selected_row, selected_row_id = pick_one_row_for_participant()
