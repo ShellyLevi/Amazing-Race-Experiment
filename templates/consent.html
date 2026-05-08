@@ -229,6 +229,13 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 768px) { .static-grid { grid-template-columns: 1fr; } .option-row { flex-direction: column; align-items: center; gap: 15px; } }
+        #small-timer {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
@@ -304,6 +311,10 @@
         <p><strong>shelll@post.bgu.ac.il</strong> | <strong>hajajer@post.bgu.ac.il</strong></p>
     </section>
 
+    <div id="small-timer">
+        Consent unlocks in 15s
+    </div>
+    
     <form id="consent-section" action="/submit_consent" method="post">
         <div class="checkered-wrapper">
             <div class="consent-card-main">
@@ -347,10 +358,28 @@
         }
     }
 
-    setTimeout(function() {
-        timerDone = true;
-        checkUnlock();
-    }, 15000); // 15 seconds
+    let countdown = 15;
+    
+    const timerElement = document.getElementById("small-timer");
+    
+    const timer = setInterval(function() {
+    
+        countdown--;
+    
+        timerElement.textContent = `Consent unlocks in ${countdown}s`;
+    
+        if (countdown <= 0) {
+    
+            clearInterval(timer);
+    
+            timerDone = true;
+    
+            timerElement.remove();
+    
+            checkUnlock();
+        }
+    
+    }, 1000);
 </script>
 
 </body>
