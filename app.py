@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import base64
 import os
-
+import json
 
 app = Flask(__name__)
 
@@ -57,12 +57,22 @@ def encrypt_string(plain_text: str, key: bytes) -> str:
 # =========================
 def pick_one_row_for_participant():
     """
-    בוחר שורה אקראית מתוך input.xlsx בלי לחזור על RowID שכבר נבחר.
-    מחזיר:
-    - row_index: מספר שורה 1-based עבור השימוש באפליקציה
-    - row_id: הערך הייחודי מתוך עמודת RowID
+    בוחר שורה רק מתוך רשימת RowID חסרים, 
+    שומר את המזהים שכבר נבחרו בקובץ לוקלי קטן,
+    בלי לגעת או לקרוא מקובץ הפלט הכללי.
     """
+    missing_row_ids = [
+        3, 7, 52, 80, 81, 83,
+        86, 96, 128, 141, 147,
+        163, 174
+    ]
+    
+    # הגדרת נתיב לקובץ המעקב המקומי (קובץ JSON פשוט)
+    local_registry_path = "used_missing_ids.json"
+    
+    # משתמשים בנעילה כדי למנוע משני משתתפים לקרוא/לכתוב לקובץ המקומי בו-זמנית
     with FileLock(output_lock_file_path):
+
         df_input = pd.read_excel(file_path)
 
         if df_input.empty:
@@ -71,30 +81,44 @@ def pick_one_row_for_participant():
         if 'RowID' not in df_input.columns:
             raise ValueError("input.xlsx must contain a unique 'RowID' column")
 
-        try:
-            df_output = pd.read_excel(file_path_output)
-        except FileNotFoundError:
-            df_output = pd.DataFrame()
-
-        if 'RowID' in df_output.columns:
-            used_row_ids = set(
-                pd.to_numeric(df_output['RowID'], errors='coerce')
-                .dropna()
-                .astype(int)
-                .tolist()
-            )
+        # --- שלב 1: קריאת המזהים שכבר ניצלנו מהקובץ הלוקלי ---
+        if os.path.exists(local_registry_path):
+            with open(local_registry_path, "r") as f:
+                try:
+                    used_row_ids = set(json.load(f))
+                except json.JSONDecodeError:
+                    used_row_ids = set()
         else:
             used_row_ids = set()
 
-        available_df = df_input[~df_input['RowID'].isin(used_row_ids)]
+        # --- שלב 2: סינון - השארת רק מזהים חסרים שטרם נוצלו ---
+        available_ids = [
+            row_id for row_id in missing_row_ids
+            if row_id not in used_row_ids
+        ]
 
-        if available_df.empty:
-            raise ValueError("No available rows left in input.xlsx")
+        if not available_ids:
+            raise ValueError("No missing RowIDs left in the local registry")
 
-        random_row = available_df.sample(n=1).iloc[0]
+        # --- שלב 3: בחירה אקראית ---
+        selected_row_id = pd.Series(available_ids).sample(n=1).iloc[0]
+
+        # שליפת השורה המתאימה מה-input
+        selected_row = df_input[df_input['RowID'] == selected_row_id]
+
+        if selected_row.empty:
+            raise ValueError(f"RowID {selected_row_id} not found in input.xlsx")
+
+        random_row = selected_row.iloc[0]
         row_index = int(random_row.name + 1)
         row_id = int(random_row['RowID'])
 
+        # --- שלב 4: עדכון ושמירה לוקלית מיידית (לפני שחרור הנעילה) ---
+        used_row_ids.add(row_id)
+        with open(local_registry_path, "w") as f:
+            json.dump(list(used_row_ids), f)
+
+        # מחזירים את התוצאה לאפליקציה
         return row_index, row_id
 
 
