@@ -20,7 +20,7 @@ os.makedirs(DATA_DIR, exist_ok=True)
 file_path = 'input.xlsx'   # נשאר בתוך הפרויקט
 file_path_output = os.path.join(DATA_DIR, 'output.xlsx')
 output_lock_file_path = os.path.join(DATA_DIR, 'output.lock')
-
+local_registry_path = os.path.join(DATA_DIR, "used_missing_ids.json")
 # חשוב: תחליפי למפתחות אמיתיים
 encryption_key = b'Sixteen byte key'
 app.secret_key = 'replace_with_real_secret_key'
@@ -67,9 +67,7 @@ def pick_one_row_for_participant():
         163, 174
     ]
     
-    # הגדרת נתיב לקובץ המעקב המקומי (קובץ JSON פשוט)
-    local_registry_path = "used_missing_ids.json"
-    
+
     # משתמשים בנעילה כדי למנוע משני משתתפים לקרוא/לכתוב לקובץ המקומי בו-זמנית
     with FileLock(output_lock_file_path):
 
@@ -540,6 +538,9 @@ def admin_clear():
         empty_df = pd.DataFrame()
         empty_df = ensure_output_columns(empty_df)
         empty_df.to_excel(file_path_output, index=False)
+        # מחיקת קובץ המעקב של RowID
+        if os.path.exists(local_registry_path):
+            os.remove(local_registry_path)
 
     return "Output file cleared successfully."
 
